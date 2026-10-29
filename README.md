@@ -1,21 +1,71 @@
 <div align="center">
 
+<img src="public/favicon-icon.png" alt="Логотип Chatra" width="76">
+
 # Chatra
 
-**Web frontend**
+**Учиться. Создавать. Развиваться.**
 
-Веб-интерфейс образовательной платформы Chatra.
+Образовательная платформа для студентов и преподавателей.<br>
+Предметы, материалы, задания и ИИ-помощник — в одном пространстве.
 
 <p>
-  <img alt="Nuxt 3" src="https://img.shields.io/badge/Nuxt-3-00DC82?style=flat-square">
-  <img alt="Vue 3" src="https://img.shields.io/badge/Vue-3-4FC08D?style=flat-square">
-  <img alt="Pinia" src="https://img.shields.io/badge/Pinia-F7D336?style=flat-square">
-  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-3178C6?style=flat-square">
+  <img alt="Nuxt 3" src="https://img.shields.io/badge/Nuxt_3-092C34?style=flat-square&amp;logo=nuxt&amp;logoColor=00DC82">
+  <img alt="Vue 3" src="https://img.shields.io/badge/Vue_3-092C34?style=flat-square&amp;logo=vuedotjs&amp;logoColor=4FC08D">
+  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-092C34?style=flat-square&amp;logo=typescript&amp;logoColor=70E5ED">
+  <img alt="Pinia" src="https://img.shields.io/badge/Pinia-092C34?style=flat-square&amp;logo=pinia&amp;logoColor=FFD859">
 </p>
 
-<p><a href="#быстрый-старт">Быстрый старт</a> · <a href="#команды">Команды</a> · <a href="#конфигурация">Конфигурация</a></p>
+[Интерфейс](#интерфейс) · [Возможности](#возможности) · [Быстрый старт](#быстрый-старт) · [Команды](#команды)
 
 </div>
+
+![Chatra — место, где учёба яснее](docs/images/cover.svg)
+
+## Интерфейс
+
+**01 / Первое знакомство**<br>
+Спокойная типографика, бирюзовые акценты и фокус на учебном процессе.
+
+![Главная страница Chatra на компьютере](docs/images/landing-desktop.png)
+
+**02 / Внутри предмета**<br>
+Материалы курса собраны вместе: лекции, документы и презентации.
+
+![Превью материалов предмета на лендинге Chatra](docs/images/course-preview.png)
+
+<table>
+  <tr>
+    <td width="50%"><strong>03 / Задания</strong><br>Сроки и статусы — рядом с работой.</td>
+    <td width="50%"><strong>04 / ИИ-помощник</strong><br>Отдельная вкладка для вопросов по предмету.</td>
+  </tr>
+  <tr>
+    <td><img src="docs/images/assignments-preview.png" alt="Демонстрационная вкладка заданий" width="100%"></td>
+    <td><img src="docs/images/assistant-preview.png" alt="Демонстрационная вкладка ИИ-чата" width="100%"></td>
+  </tr>
+</table>
+
+<details>
+<summary><strong>05 / На небольшом экране — мобильная версия</strong></summary>
+
+<p align="center">
+  <img src="docs/images/landing-mobile.png" alt="Главная страница Chatra на экране шириной 390 пикселей" width="300">
+</p>
+
+</details>
+
+<sub>Скриншоты сделаны из локально запущенной веб-версии. Карточки курса, заданий и ИИ-чата — интерактивные демонстрационные блоки страницы /landing.</sub>
+
+## Возможности
+
+| Учебный процесс | В Chatra |
+| :--- | :--- |
+| **Предметы и материалы** | Курсы, лекции и документы в контексте предмета |
+| **Задания и обратная связь** | Сдача работ, сроки и результаты |
+| **ИИ-помощник** | Работа с вопросами по учебным материалам |
+| **Два сценария** | Интерфейсы для студентов и преподавателей |
+| **Три языка** | Русский, қазақша, English |
+| **Разные экраны** | Адаптивная веб-версия для компьютера и телефона |
 
 ---
 
@@ -73,5 +123,9 @@ npm run dev
 ---
 
 <div align="center">
-  <sub>© 2026 Chatra. All rights reserved.</sub>
+
+**Chatra** · Learn. Create. Grow.
+
+<sub>© 2026 Chatra. All rights reserved.</sub>
+
 </div>
