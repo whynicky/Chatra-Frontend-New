@@ -1,5 +1,8 @@
 <template>
   <div class="auth-card">
+    <h1 class="auth-title">{{ title }}</h1>
+    <p class="auth-sub">{{ description }}</p>
+
     <div class="org-badge-row">
       <button :class="['org-pill', { school: org.isSchool }]" :title="lang === 'ru' ? 'Сменить организацию' : lang === 'kk' ? 'Ұйымды ауыстыру' : 'Change organization'" type="button" @click="switchOrg">
         <span class="org-pill-icon">
@@ -11,15 +14,16 @@
       </button>
     </div>
 
-    <h1 class="auth-title">{{ t('login.welcome') }}</h1>
-    <p class="auth-sub">{{ t('login.sub') }}</p>
     <form @submit.prevent="sub" class="auth-form">
       <div class="frow">
         <label class="flabel" for="login-email">Email</label>
         <input id="login-email" v-model="email" type="email" class="input" :class="{'input-err':errorMsg}" placeholder="you@example.com" required autocomplete="email" :aria-invalid="!!errorMsg" :aria-describedby="errorMsg ? 'login-error' : undefined" @input="errorMsg=''"/>
       </div>
       <div class="frow">
-        <label class="flabel" for="login-password">{{ t('login.password') }}</label>
+        <div class="password-heading">
+          <label class="flabel" for="login-password">{{ t('login.password') }}</label>
+          <NuxtLink to="/forgot-password" class="forgot-link">{{ t('login.forgot') }}</NuxtLink>
+        </div>
         <div class="password-field">
           <input id="login-password" v-model="pw" :type="show?'text':'password'" class="input" :class="{'input-err':errorMsg}" placeholder="••••••••" required autocomplete="current-password" :aria-invalid="!!errorMsg" :aria-describedby="errorMsg ? 'login-error' : undefined" @input="errorMsg=''"/>
           <button type="button" @click="show=!show" class="pw-eye" :aria-label="passwordToggleLabel" :title="passwordToggleLabel" :aria-pressed="show">
@@ -32,15 +36,11 @@
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
         {{ errorMsg }}
       </div>
-      <div class="forgot-row">
-        <NuxtLink to="/forgot-password" class="forgot-link">{{ t('login.forgot') }}</NuxtLink>
-      </div>
       <button type="submit" class="auth-submit" :aria-busy="loading" :disabled="loading">
         <span v-if="loading" class="spinner" aria-hidden="true"/>
         <span>{{ t('login.submit') }}</span>
       </button>
     </form>
-    <p class="auth-link-row">{{ t('login.no_account') }} <NuxtLink to="/register" class="auth-link">{{ t('login.register') }}</NuxtLink></p>
   </div>
 </template>
 <script setup lang="ts">
@@ -53,6 +53,12 @@ definePageMeta({ layout: 'auth' })
 const { login } = useAuth()
 const { t, lang } = useI18n()
 const org = useOrgStore()
+const title = computed(() => ({ ru: 'Вход в Chatra', en: 'Sign in to Chatra', kk: 'Chatra жүйесіне кіру' })[lang.value])
+const description = computed(() => ({
+  ru: 'Откройте свои предметы и задания.',
+  en: 'Access your subjects and assignments.',
+  kk: 'Пәндеріңіз бен тапсырмаларыңызды ашыңыз.',
+})[lang.value])
 const email = ref(''); const pw = ref(''); const show = ref(false); const loading = ref(false); const errorMsg = ref('')
 const passwordToggleLabel = computed(() => show.value
   ? (lang.value === 'ru' ? 'Скрыть пароль' : lang.value === 'kk' ? 'Құпиясөзді жасыру' : 'Hide password')
@@ -89,6 +95,6 @@ const sub = async () => {
   line-height: 20px;
 }
 .login-error svg { flex: none; margin-top: 3px; }
-.forgot-row { display: flex; justify-content: flex-end; margin-top: -8px; }
-.forgot-link { display: inline-flex; align-items: center; min-height: 32px; font-size: 14px; }
+.password-heading { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px; }
+.forgot-link { font-size: 13px; }
 </style>

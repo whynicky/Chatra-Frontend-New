@@ -10,14 +10,15 @@
   box-shadow: 0 16px 48px #123c4826, 0 2px 8px #122c3514;
 }
 .auth-title {
-  margin-top: 16px;
+  margin: 0;
   font-size: 36px;
   line-height: 40px;
   font-weight: 600;
   letter-spacing: -.04em;
   text-wrap: balance;
 }
-.auth-sub { margin: 8px 0 24px; color: #51636d; font-size: 16px; line-height: 24px; }
+.auth-sub { margin: 8px 0 16px; color: #51636d; font-size: 16px; line-height: 24px; }
+.org-badge-row { margin-bottom: 20px; }
 .auth-form { display: grid; gap: 16px; }
 .frow { gap: 8px; margin: 0; }
 .flabel { margin: 0; color: #25363e; font-size: 14px; font-weight: 600; letter-spacing: normal; }
@@ -56,19 +57,19 @@
   min-height: 48px;
   padding: 8px 16px;
   border-radius: 999px;
-  background: #0d2630;
+  background: #076c7d;
   color: #fff;
   font-size: 16px;
   font-weight: 600;
   transition: background .2s cubic-bezier(.22,1,.36,1), transform .2s cubic-bezier(.22,1,.36,1);
 }
-.auth-submit:hover:not(:disabled) { background: #154755; }
+.auth-submit:hover:not(:disabled) { background: #095a69; }
 .auth-submit:active:not(:disabled) { transform: scale(.98); }
-.auth-submit:disabled { opacity: .55; cursor: default; }
+.auth-submit:disabled { background: #e2ecee; color: #50636a; cursor: default; }
+.auth-submit[aria-busy="true"] { background: #076c7d; color: #fff; }
 .auth-submit .spinner { width: 16px; height: 16px; border-width: 2px; border-color: #ffffff55; border-top-color: #fff; }
-.auth-link-row { margin-top: 24px; color: #51636d; font-size: 14px; line-height: 20px; text-align: center; }
-.auth-link, .forgot-link, .reg-foot-link { color: var(--auth-accent); font-weight: 600; }
-.auth-link:hover, .forgot-link:hover, .reg-foot-link:hover { text-decoration: underline; text-underline-offset: 3px; }
+.forgot-link, .reg-foot-link { color: var(--auth-accent); font-weight: 600; }
+.forgot-link:hover, .reg-foot-link:hover { text-decoration: underline; text-underline-offset: 3px; }
 .org-pill {
   display: inline-flex;
   align-items: center;

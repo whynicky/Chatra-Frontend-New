@@ -28,6 +28,7 @@ defineProps<{ mirrored?: boolean }>()
     width: 100%;
     display: grid;
     grid-template-columns: repeat(14, 7.7778%);
+    opacity: var(--glow-strength, 1);
     transform: translateX(-53.8889%);
     mask-image: linear-gradient(transparent 9%, #0004 22%, #000 38%, #000 59%, transparent 85%);
   }

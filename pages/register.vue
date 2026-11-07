@@ -1,5 +1,8 @@
 <template>
   <div class="auth-card">
+    <h1 class="auth-title">{{ t('register.title') }}</h1>
+    <p class="auth-sub">{{ description }}</p>
+
     <div class="org-badge-row">
       <button :class="['org-pill', { school: org.isSchool }]" :title="lang === 'ru' ? 'Сменить организацию' : lang === 'kk' ? 'Ұйымды ауыстыру' : 'Change organization'" type="button" @click="switchOrg">
         <span class="org-pill-icon">
@@ -11,8 +14,6 @@
       </button>
     </div>
 
-    <h1 class="auth-title">{{ t('register.title') }}</h1>
-    <p class="auth-sub">{{ t('register.sub') }}</p>
     <form @submit.prevent="sub" class="auth-form">
       <div class="frow">
         <label class="flabel" for="register-fullname">{{ t('register.fullname') }} <span aria-hidden="true" style="color:var(--red)">*</span></label>
@@ -50,8 +51,7 @@
         <span>{{ t('register.submit') }}</span>
       </button>
     </form>
-    <p class="auth-link-row">{{ t('register.has_account') }} <NuxtLink to="/login" class="reg-foot-link">{{ t('register.login_link') }}</NuxtLink></p>
-    <p class="auth-link-row auth-legal"><NuxtLink to="/rules" class="reg-foot-link">{{ t('common.rules') }}</NuxtLink> · <NuxtLink to="/privacy" class="reg-foot-link">{{ t('common.privacy') }}</NuxtLink></p>
+    <p class="auth-legal"><NuxtLink to="/rules" class="reg-foot-link">{{ t('common.rules') }}</NuxtLink> · <NuxtLink to="/privacy" class="reg-foot-link">{{ t('common.privacy') }}</NuxtLink></p>
   </div>
 </template>
 
@@ -68,6 +68,11 @@ const { register } = useAuth()
 const toast = useToast()
 const { t, lang } = useI18n()
 const org = useOrgStore()
+const description = computed(() => ({
+  ru: 'Отправим код подтверждения на вашу почту.',
+  en: 'We’ll email you a confirmation code.',
+  kk: 'Электрондық поштаңызға растау кодын жібереміз.',
+})[lang.value])
 
 const switchOrg = () => { org.clear(); if (import.meta.client) window.location.href = '/org' }
 
@@ -118,5 +123,5 @@ const sub = async () => {
 .str-bar { width: 96px; height: 4px; overflow: hidden; border-radius: 999px; background: #dce8ea; }
 .str-fill { height: 100%; border-radius: inherit; }
 .str-lbl { color: #51636d; font-size: 12px; }
-.auth-legal { margin-top: 12px; font-size: 12px; }
+.auth-legal { margin-top: 16px; color: #51636d; font-size: 12px; line-height: 20px; text-align: center; }
 </style>
