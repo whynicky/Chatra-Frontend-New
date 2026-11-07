@@ -1,131 +1,133 @@
 <div align="center">
 
-<img src="public/favicon-icon.png" alt="Логотип Chatra" width="76">
+<img src="public/favicon-icon.png" alt="Логотип Chatra" width="64">
 
 # Chatra
 
-**Учиться. Создавать. Развиваться.**
+**Учебная платформа для студентов и преподавателей**
 
-Образовательная платформа для студентов и преподавателей.<br>
-Предметы, материалы, задания и ИИ-помощник — в одном пространстве.
+Лекции, задания, дедлайны и ИИ-помощник в одном учебном пространстве.
 
 <p>
-  <img alt="Nuxt 3" src="https://img.shields.io/badge/Nuxt_3-092C34?style=flat-square&amp;logo=nuxt&amp;logoColor=00DC82">
-  <img alt="Vue 3" src="https://img.shields.io/badge/Vue_3-092C34?style=flat-square&amp;logo=vuedotjs&amp;logoColor=4FC08D">
-  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-092C34?style=flat-square&amp;logo=typescript&amp;logoColor=70E5ED">
-  <img alt="Pinia" src="https://img.shields.io/badge/Pinia-092C34?style=flat-square&amp;logo=pinia&amp;logoColor=FFD859">
+  <img alt="Nuxt 3" src="https://img.shields.io/badge/Nuxt_3-0B2630?style=flat-square&amp;logo=nuxt&amp;logoColor=00DC82">
+  <img alt="Vue 3" src="https://img.shields.io/badge/Vue_3-0B2630?style=flat-square&amp;logo=vuedotjs&amp;logoColor=4FC08D">
+  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-0B2630?style=flat-square&amp;logo=typescript&amp;logoColor=70E5ED">
+  <img alt="Pinia" src="https://img.shields.io/badge/Pinia-0B2630?style=flat-square&amp;logo=pinia&amp;logoColor=FFD859">
 </p>
 
-[Интерфейс](#интерфейс) · [Возможности](#возможности) · [Быстрый старт](#быстрый-старт) · [Команды](#команды)
+[Возможности](#возможности) · [Интерфейс](#интерфейс) · [Быстрый старт](#быстрый-старт) · [Разработка](#разработка)
 
 </div>
 
-![Chatra — место, где учёба яснее](docs/images/cover.svg)
-
-## Интерфейс
-
-**01 / Первое знакомство**<br>
-Спокойная типографика, бирюзовые акценты и фокус на учебном процессе.
-
-![Главная страница Chatra на компьютере](docs/images/landing-desktop.png)
-
-**02 / Внутри предмета**<br>
-Материалы курса собраны вместе: лекции, документы и презентации.
-
-![Превью материалов предмета на лендинге Chatra](docs/images/course-preview.png)
-
-<table>
-  <tr>
-    <td width="50%"><strong>03 / Задания</strong><br>Сроки и статусы — рядом с работой.</td>
-    <td width="50%"><strong>04 / ИИ-помощник</strong><br>Отдельная вкладка для вопросов по предмету.</td>
-  </tr>
-  <tr>
-    <td><img src="docs/images/assignments-preview.png" alt="Демонстрационная вкладка заданий" width="100%"></td>
-    <td><img src="docs/images/assistant-preview.png" alt="Демонстрационная вкладка ИИ-чата" width="100%"></td>
-  </tr>
-</table>
-
-<details>
-<summary><strong>05 / На небольшом экране — мобильная версия</strong></summary>
-
-<p align="center">
-  <img src="docs/images/landing-mobile.png" alt="Главная страница Chatra на экране шириной 390 пикселей" width="300">
-</p>
-
-</details>
-
-<sub>Скриншоты сделаны из локально запущенной веб-версии. Карточки курса, заданий и ИИ-чата — интерактивные демонстрационные блоки страницы /landing.</sub>
+[![Первый экран сайта Chatra с превью каталога предметов](docs/images/landing-desktop.webp)](docs/images/landing-desktop.webp)
 
 ## Возможности
 
-| Учебный процесс | В Chatra |
+| Студентам | Преподавателям |
 | :--- | :--- |
-| **Предметы и материалы** | Курсы, лекции и документы в контексте предмета |
-| **Задания и обратная связь** | Сдача работ, сроки и результаты |
-| **ИИ-помощник** | Работа с вопросами по учебным материалам |
-| **Два сценария** | Интерфейсы для студентов и преподавателей |
-| **Три языка** | Русский, қазақша, English |
-| **Разные экраны** | Адаптивная веб-версия для компьютера и телефона |
+| Подключайтесь к предметам по коду и открывайте лекции и файлы внутри курса. | Создавайте предметы, публикуйте материалы и приглашайте студентов. |
+| Следите за сроками в календаре, сдавайте работы и смотрите оценки с обратной связью. | Задавайте критерии проверки, просматривайте сдачи и запускайте ИИ-оценивание. |
+| Задавайте вопросы ИИ-помощнику по темам и материалам предмета. | Ведите несколько учебных потоков и открывайте материалы прошлых лет в архиве. |
 
----
+Веб-версия адаптируется под телефон. Интерфейс доступен на русском, казахском и английском.
+
+## Интерфейс
+
+### Каталог предметов
+
+Карточки курсов, вход по коду и быстрый доступ к ближайшему дедлайну.
+
+[![Каталог Chatra с шестью курсами, закреплёнными предметами и ближайшим дедлайном](docs/images/catalog-desktop.webp)](docs/images/catalog-desktop.webp)
+
+### Внутри предмета
+
+Лекции, задания и ИИ-чат открываются из одного курса. В обзоре рядом видны успеваемость и ближайший срок сдачи.
+
+[![Курс «Основы физики» со списком лекций и обзором успеваемости](docs/images/course-preview.webp)](docs/images/course-preview.webp)
+
+<table>
+  <thead>
+    <tr>
+      <th width="50%">Задания</th>
+      <th width="50%">ИИ-помощник</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><a href="docs/images/assignments-preview.webp"><img src="docs/images/assignments-preview.webp" alt="Вкладка заданий со сроками и статусами сдачи" width="100%"></a></td>
+      <td><a href="docs/images/assistant-preview.webp"><img src="docs/images/assistant-preview.webp" alt="Диалог с Chatra AI о втором законе Ньютона" width="100%"></a></td>
+    </tr>
+  </tbody>
+</table>
+
+<details>
+<summary><strong>Мобильные экраны</strong> · лендинг, вход и регистрация</summary>
+
+<table>
+  <thead>
+    <tr>
+      <th width="33%">Лендинг</th>
+      <th width="33%">Вход</th>
+      <th width="33%">Регистрация</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><a href="docs/images/landing-mobile.webp"><img src="docs/images/landing-mobile.webp" alt="Мобильный лендинг Chatra" width="100%"></a></td>
+      <td><a href="docs/images/login-mobile.webp"><img src="docs/images/login-mobile.webp" alt="Форма входа Chatra на телефоне" width="100%"></a></td>
+      <td><a href="docs/images/register-mobile.webp"><img src="docs/images/register-mobile.webp" alt="Форма регистрации Chatra на телефоне" width="100%"></a></td>
+    </tr>
+  </tbody>
+</table>
+
+</details>
+
+<sub>Скриншоты сняты в локальной веб-версии. Предметы, работы и переписка на них демонстрационные.</sub>
 
 ## Быстрый старт
 
-### 1. Настройте окружение
+Понадобится Node.js 22, который используется в CI, и отдельно запущенный API Chatra.
 
-Создайте файл `.env` в корне фронтенда:
+1. Установите зависимости в папке фронтенда.
 
-```env
-NUXT_PUBLIC_API_BASE=http://localhost:8000/api
-```
+   ```bash
+   npm ci
+   ```
 
-### 2. Установите зависимости
+2. Создайте `.env` и укажите адрес API, доступный из браузера.
 
-```bash
-npm install
-```
+   ```env
+   NUXT_PUBLIC_API_BASE=http://localhost:8000/api
+   ```
 
-### 3. Запустите приложение
+3. Запустите сервер разработки.
 
-```bash
-npm run dev
-```
+   ```bash
+   npm run dev
+   ```
 
-Откройте [localhost:3000](http://localhost:3000). Бэкенд должен быть запущен отдельно.
+Откройте [localhost:3000](http://localhost:3000).
 
----
+При размещении фронтенда и API за одним прокси можно использовать относительный путь `/api`. Для раздельного размещения укажите полный HTTPS-адрес API. Примеры есть в [`.env.example`](.env.example).
 
-## Команды
+## Разработка
 
 | Команда | Назначение |
 | :--- | :--- |
-| `npm run dev` | Сервер разработки |
-| `npm run build` | Сборка для продакшена |
-| `npm run preview` | Предпросмотр сборки |
-| `npm run typecheck` | Проверка типов |
-| `npm run lint` | Проверка стиля кода |
-| `npm test` | Модульные и компонентные тесты |
-| `npm run test:e2e` | Сквозные тесты Playwright |
+| `npm run dev` | Запустить сервер разработки |
+| `npm run build` | Собрать приложение для продакшена |
+| `npm run preview` | Запустить собранную версию локально |
+| `npm run typecheck` | Проверить типы |
+| `npm run lint` | Запустить ESLint |
+| `npm test` | Запустить модульные и компонентные тесты |
+| `npm run test:e2e` | Запустить браузерные тесты на компьютере и телефоне |
 
----
+Перед первым запуском браузерных тестов установите Chromium командой `npx playwright install chromium`.
 
-## Конфигурация
-
-| Переменная | Назначение | Значение для разработки |
-| :--- | :--- | :--- |
-| `NUXT_PUBLIC_API_BASE` | Базовый URL API | `http://localhost:8000/api` |
-
-Для продакшена укажите HTTPS-адрес вашего API с суффиксом `/api`.
-
-Основные настройки приложения находятся в [`nuxt.config.ts`](nuxt.config.ts),
-команды и зависимости — в [`package.json`](package.json).
+Страницы находятся в [`pages/`](pages), компоненты в [`components/`](components), состояние приложения в [`stores/`](stores), клиент API в [`services/`](services). Основные настройки Nuxt находятся в [`nuxt.config.ts`](nuxt.config.ts).
 
 ---
 
 <div align="center">
-
-**Chatra** · Learn. Create. Grow.
-
-<sub>© 2026 Chatra. All rights reserved.</sub>
-
+  <sub>© 2026 Chatra. All rights reserved.</sub>
 </div>
