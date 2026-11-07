@@ -7,12 +7,16 @@ import { sameFilePath } from '~/composables/useFileUrl'
 // заходе на страницу.
 const STALE_MS = 60_000
 
+const pinnedKey = (userId: number) => `_pinned_subjects_${userId}`
+
 export const useClassesStore = defineStore('classes', {
   state: () => ({
     list: [] as ClassResponse[],
     posts: [] as any[],
     loaded: false,
     lastFetch: 0,
+    pinnedUserId: null as number | null,
+    pinnedIds: [] as number[],
   }),
 
   getters: {
@@ -20,6 +24,28 @@ export const useClassesStore = defineStore('classes', {
   },
 
   actions: {
+    loadPins(userId: number) {
+      if (this.pinnedUserId === userId) return
+      this.pinnedUserId = userId
+      this.pinnedIds = []
+      try {
+        const saved = JSON.parse(localStorage.getItem(pinnedKey(userId)) || '[]')
+        if (Array.isArray(saved)) {
+          this.pinnedIds = [...new Set<number>(saved.filter((id) => Number.isInteger(id) && id > 0))]
+        }
+      } catch { /* Pins remain available in memory if browser storage is unavailable. */ }
+    },
+
+    togglePin(userId: number, classId: number) {
+      this.loadPins(userId)
+      this.pinnedIds = this.pinnedIds.includes(classId)
+        ? this.pinnedIds.filter(id => id !== classId)
+        : [...this.pinnedIds, classId]
+      try {
+        localStorage.setItem(pinnedKey(userId), JSON.stringify(this.pinnedIds))
+      } catch { /* Keep the current in-memory selection. */ }
+    },
+
     // Список классов живёт в сторе, а не в локальном state страницы — Nuxt
     // полностью пересоздаёт компонент страницы при каждой навигации, и без
     // общего кэша каталог (со всеми обложками) гонял бы GET /classes/ и

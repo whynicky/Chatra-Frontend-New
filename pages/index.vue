@@ -64,9 +64,18 @@
                   <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
                   {{ cls.invite_code }}
                 </button>
-                <button v-if="canManage(cls)" class="card-edit-btn" @click.stop="openEditClass(cls)" title="Редактировать">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                </button>
+                <div class="card-cover-actions">
+                  <button v-if="auth.user" type="button" class="card-cover-btn card-pin-btn"
+                          :aria-label="`${t('sidebar.pin_subject')}: ${cls.name}`"
+                          :aria-pressed="pinnedIds.includes(cls.id)"
+                          :title="t(pinnedIds.includes(cls.id) ? 'sidebar.unpin_subject' : 'sidebar.pin_subject')"
+                          @click.stop="classesStore.togglePin(auth.user.id, cls.id)">
+                    <svg width="16" height="16" viewBox="0 0 24 24" :fill="pinnedIds.includes(cls.id) ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4h10v16l-5-3.5L7 20z"/></svg>
+                  </button>
+                  <button v-if="canManage(cls)" type="button" class="card-cover-btn" @click.stop="openEditClass(cls)" title="Редактировать">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  </button>
+                </div>
               </div>
               <div class="card-body">
                 <h3 class="card-name">{{ cls.name }}</h3>
@@ -273,6 +282,7 @@ import { fixFileUrl } from '~/composables/useFileUrl'
 definePageMeta({ layout: 'default' })
 const auth = useAuthStore(); const postsSvc = usePostsSvc(); const classesSvc = useClassesSvc(); const toast = useToast(); const router = useRouter()
 const classesStore = useClassesStore()
+const pinnedIds = computed(() => classesStore.pinnedUserId === auth.user?.id ? classesStore.pinnedIds : [])
 const { t, lang, setLang } = useI18n()
 const cohortErrors = useCohortErrors()
 const coverArt = useCoverArt()
@@ -693,9 +703,13 @@ watch(() => auth.user?.id, async (newId) => {
 .card-code-chip:hover{background:rgba(30,30,32,.75)}
 .card-code-chip:active{transform:scale(.96)}
 .card-code-chip svg{flex-shrink:0;display:block}
-.card-edit-btn{position:absolute;z-index:2;top:10px;right:10px;width:32px;height:32px;border-radius:50%;background:rgba(30,30,32,.52);border:1px solid rgba(255,255,255,.2);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s,transform .15s;-webkit-backdrop-filter:blur(14px) saturate(160%);backdrop-filter:blur(14px) saturate(160%)}
-.card-edit-btn:hover{background:rgba(var(--teal-rgb),.82);border-color:rgba(255,255,255,.24)}
-.card-edit-btn:active{transform:scale(.92)}
+.card-cover-actions{position:absolute;z-index:2;top:10px;right:10px;display:flex;gap:4px}
+.card-cover-btn{width:32px;height:32px;border-radius:50%;background:rgba(30,30,32,.52);border:1px solid rgba(255,255,255,.2);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s,transform .15s;-webkit-backdrop-filter:blur(14px) saturate(160%);backdrop-filter:blur(14px) saturate(160%)}
+.card-cover-btn:hover{background:rgba(var(--teal-rgb),.82);border-color:rgba(255,255,255,.24)}
+.card-cover-btn:active{transform:scale(.92)}
+.card-pin-btn[aria-pressed="true"]{background:var(--surface);color:var(--text1);border-color:var(--border)}
+.card-pin-btn:focus-visible{outline:2px solid #fff;outline-offset:2px}
+@media (max-width:768px){.card-pin-btn{display:none}}
 
 .card-body{display:flex;flex:1;flex-direction:column;padding:18px 20px 18px}
 /* Название — единственный явный заголовок карточки (декоративная иконка
@@ -814,11 +828,11 @@ watch(() => auth.user?.id, async (newId) => {
 }
 @media (prefers-reduced-transparency:reduce){
   .class-card{background:var(--surface)}
-  .card-code-chip,.card-edit-btn{-webkit-backdrop-filter:none;backdrop-filter:none;background:rgba(30,30,32,.86)}
+  .card-code-chip,.card-cover-btn{-webkit-backdrop-filter:none;backdrop-filter:none;background:rgba(30,30,32,.86)}
 }
 @media (prefers-contrast:more){
   .class-card{border-color:var(--text4)}
-  .card-code-chip,.card-edit-btn{border-color:#fff}
+  .card-code-chip,.card-cover-btn{border-color:#fff}
 }
 /* На планшетных ширинах (~600–768) единственная teal-кнопка растягивалась
    flex:1 на всю строку и выглядела непропорционально огромной рядом с

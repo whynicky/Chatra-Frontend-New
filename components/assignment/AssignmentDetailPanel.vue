@@ -479,7 +479,7 @@ import { useAssignmentsSvc } from '~/services/assignments'
 import { useUploadSvc } from '~/services/uploads'
 import { useUsersSvc } from '~/services/users'
 import { useToast } from '~/composables/useToast'
-import { parseUtc } from '~/composables/useDeadline'
+import { parseUtc, useDeadlineSubmissionRevision } from '~/composables/useDeadline'
 import { useI18n } from '~/composables/useI18n'
 import { useCohortErrors } from '~/composables/useCohortErrors'
 import { useAuthStore } from '~/stores/auth.store'
@@ -512,6 +512,7 @@ const openFile = (url: string, name: string) => {
 }
 
 const svc = useAssignmentsSvc()
+const deadlineSubmissionRevision = useDeadlineSubmissionRevision()
 const uploadSvc = useUploadSvc()
 const usersSvc = useUsersSvc()
 const toast = useToast()
@@ -930,6 +931,7 @@ const retract = async () => {
   retracting.value = true
   try {
     await svc.retractSubmission(mySubmission.value.id)
+    deadlineSubmissionRevision.value++
     await refreshMySubmissions()
     form.value = { text: '', file: null }
     uploadedUrl.value = ''
@@ -966,6 +968,7 @@ const doSubmit = async () => {
       file_urls: fileUrls.length ? fileUrls : undefined,
       student_name: auth.fullname || undefined,
     })
+    deadlineSubmissionRevision.value++
     await refreshMySubmissions()
     toast.ok(t('am.work_submitted'))
     emit('submitted', sub)

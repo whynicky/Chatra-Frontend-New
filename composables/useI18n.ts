@@ -20,6 +20,14 @@ export const translations: Record<string, Record<Lang, string>> = {
   'nav.settings': { ru: 'Настройки', en: 'Settings', kk: 'Параметрлер' },
   'nav.online': { ru: 'Онлайн', en: 'Online', kk: 'Желіде' },
   'nav.logout': { ru: 'Выйти', en: 'Logout', kk: 'Шығу' },
+  'sidebar.pinned_subjects': { ru: 'Закреплённые предметы', en: 'Pinned subjects', kk: 'Бекітілген пәндер' },
+  'sidebar.pin_subject': { ru: 'Закрепить предмет', en: 'Pin subject', kk: 'Пәнді бекіту' },
+  'sidebar.unpin_subject': { ru: 'Открепить предмет', en: 'Unpin subject', kk: 'Пәнді бекітуден алу' },
+  'sidebar.pins_empty': { ru: 'Закрепите предмет в каталоге', en: 'Pin a subject from the catalog', kk: 'Каталогта пәнді бекітіңіз' },
+  'sidebar.next_deadline': { ru: 'Ближайший дедлайн', en: 'Next deadline', kk: 'Ең жақын мерзім' },
+  'sidebar.no_deadlines': { ru: 'Нет ближайших дедлайнов', en: 'No upcoming deadlines', kk: 'Алдағы мерзімдер жоқ' },
+  'sidebar.deadlines_error': { ru: 'Не удалось загрузить дедлайны', en: 'Could not load deadlines', kk: 'Мерзімдерді жүктеу мүмкін болмады' },
+  'sidebar.open_calendar': { ru: 'Открыть календарь', en: 'Open calendar', kk: 'Күнтізбені ашу' },
 
   // Settings
   'settings.title': { ru: 'Настройки аккаунта', en: 'Account Settings', kk: 'Аккаунт параметрлері' },

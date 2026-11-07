@@ -33,9 +33,10 @@ const minimalPdf = () => {
   return Buffer.from(content)
 }
 
-async function mockApi(page: Page, options: { authenticated?: boolean; role?: 'student' | 'teacher' | 'admin'; withPdf?: boolean; withClass?: boolean } = {}) {
+async function mockApi(page: Page, options: { authenticated?: boolean; role?: 'student' | 'teacher' | 'admin'; withPdf?: boolean; withClass?: boolean; withDeadlines?: boolean } = {}) {
   const authenticated = options.authenticated ?? true
   const role = options.role ?? 'student'
+  let nextSubmission: { id: number; assignment_id: number; student_id: number; status: string; submitted_at: string } | null = null
   await page.addInitScript(() => localStorage.setItem('org_type', 'university'))
   await page.route('http://localhost:8000/api/**', async (route) => {
     const request = route.request()
@@ -72,11 +73,33 @@ async function mockApi(page: Page, options: { authenticated?: boolean; role?: 's
       }] : [])
     }
     if (path.includes('/annotations')) return json(route, [])
-    if (path.endsWith('/assignments/')) return json(route, options.withClass ? [{
+    const assignment = {
       id: 20, class_id: 1, title: 'E2E Assignment', description: 'Verified assignment list',
       criteria: '[{"name":"Quality","weight":100}]', max_score: 100,
       created_at: '2026-10-10T10:00:00', is_active: true, created_by: 1,
-    }] : [])
+    }
+    if (path.endsWith('/assignments/') && options.withDeadlines) {
+      const due = (hours: number) => new Date(Date.now() + hours * 3_600_000).toISOString()
+      return json(route, [
+        { ...assignment, id: 20, title: 'Later assignment', deadline: due(48) },
+        { ...assignment, id: 21, title: 'Next assignment', deadline: due(24) },
+        { ...assignment, id: 22, title: 'Already submitted', deadline: due(12) },
+        { ...assignment, id: 23, title: 'Expired assignment', deadline: due(-1) },
+      ])
+    }
+    if (path.endsWith('/assignments/')) return json(route, options.withClass ? [assignment] : [])
+    if (path.endsWith('/assignments/student/my-submissions') && options.withDeadlines) {
+      const submitted = { id: 1, assignment_id: '22', student_id: 1, status: 'submitted' }
+      return json(route, nextSubmission ? [submitted, nextSubmission] : [submitted])
+    }
+    if (path.endsWith('/assignments/21/submit') && options.withDeadlines) {
+      nextSubmission = { id: 2, assignment_id: 21, student_id: 1, status: 'submitted', submitted_at: new Date().toISOString() }
+      return json(route, nextSubmission)
+    }
+    if (path.endsWith('/submissions/2') && request.method() === 'DELETE' && options.withDeadlines) {
+      nextSubmission = null
+      return route.fulfill({ status: 204, headers: corsHeaders })
+    }
     if (path.includes('/assignments')) return json(route, [])
     if (path.includes('/notifications')) return json(route, [])
     return json(route, request.method() === 'GET' ? [] : {})
@@ -113,6 +136,52 @@ test('role navigation, calendar, language, dialog keyboard behavior, and logout'
   await page.goto('/settings')
   await page.getByRole('main').getByRole('button', { name: 'Logout' }).click()
   await expect(page).toHaveURL(/\/org$/)
+})
+
+test('sidebar shows saved subjects above the nearest outstanding deadline', async ({ page }) => {
+  await mockApi(page, { withClass: true, withDeadlines: true })
+  await page.goto('/')
+
+  const sidebar = page.getByRole('complementary')
+  const pinned = sidebar.getByRole('region', { name: 'Закреплённые предметы' })
+  const deadline = sidebar.getByRole('region', { name: 'Ближайший дедлайн' })
+  const pin = page.getByRole('button', { name: 'Закрепить предмет: E2E Course' })
+  await expect(sidebar.getByRole('button', { name: /тёмная тема|светлая тема/i })).toHaveCount(0)
+
+  if (page.viewportSize()!.width <= 768) {
+    await expect(sidebar.getByRole('link', { name: 'Предметы' })).toBeVisible()
+    await expect(pinned).toHaveCount(0)
+    await expect(deadline).toHaveCount(0)
+    await expect(pin).toHaveCount(0)
+    return
+  }
+
+  await expect(sidebar.getByRole('heading')).toHaveText(['Закреплённые предметы', 'Ближайший дедлайн'])
+  await expect(deadline.getByRole('link', { name: /Next assignment/ }))
+    .toHaveAttribute('href', '/classes/1/assignments/21')
+  await pin.click()
+  await expect(page).toHaveURL(/\/$/)
+  await expect(pinned.getByRole('link', { name: 'E2E Course' })).toHaveAttribute('href', '/classes/1')
+
+  await sidebar.getByRole('button', { name: 'Свернуть панель' }).click()
+  await page.reload()
+  await expect(pin).toHaveAttribute('aria-pressed', 'true')
+  await expect(sidebar).toHaveClass(/collapsed/)
+  await expect(pinned.getByRole('link', { name: 'E2E Course' })).toBeVisible()
+  await expect(deadline.getByRole('link', { name: /Next assignment/ }))
+    .toHaveAttribute('href', '/classes/1/assignments/21')
+  await sidebar.getByRole('button', { name: 'Развернуть панель' }).click()
+  await expect(pinned.getByRole('link', { name: 'E2E Course' })).toBeVisible()
+  await pin.click()
+  await expect(pinned.getByRole('link', { name: 'E2E Course' })).toHaveCount(0)
+
+  await deadline.getByRole('link', { name: /Next assignment/ }).click()
+  await expect(page).toHaveURL(/\/classes\/1\/assignments\/21$/)
+  await page.getByPlaceholder('Напишите ваш ответ...').fill('Sample answer')
+  await page.getByRole('button', { name: 'Сдать работу', exact: true }).click()
+  await expect(deadline.getByRole('link', { name: /Later assignment/ })).toBeVisible()
+  await page.getByRole('button', { name: 'Отозвать и сдать заново' }).click()
+  await expect(deadline.getByRole('link', { name: /Next assignment/ })).toBeVisible()
 })
 
 test('teacher create-class dialog traps focus, closes with Escape, and restores focus', async ({ page }) => {
