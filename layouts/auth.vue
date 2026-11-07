@@ -1,30 +1,52 @@
 <template>
   <div class="auth-shell">
-    <div class="auth-content">
-      <span class="auth-logo-mark" role="img" aria-label="Chatra"></span>
-      <div class="lang-switcher" role="tablist">
-        <span class="lang-thumb" :style="{ transform: `translateX(${langIndex * 100}%)` }"></span>
-        <button v-for="l in langs" :key="l.code" @click="setLang(l.code)"
-          :class="['lang-btn', { active: lang === l.code }]" role="tab" :aria-selected="lang === l.code">
-          {{ l.label }}
+    <LandingGlow class="auth-glow"/>
+    <header class="auth-header">
+      <NuxtLink to="/landing" class="auth-brand">
+        <span class="auth-logo-mark" aria-hidden="true"/>
+        Chatra
+      </NuxtLink>
+
+      <div class="lang-switcher" role="group" :aria-label="copy.language">
+        <span class="lang-thumb" :style="{ transform: `translateX(${langIndex * 100}%)` }"/>
+        <button v-for="item in langs" :key="item.code" type="button" class="lang-btn"
+          :aria-label="item.name" :aria-pressed="lang === item.code" @click="setLang(item.code)">
+          {{ item.label }}
         </button>
       </div>
-      <slot/>
-    </div>
+    </header>
+
+    <main class="auth-stage" :class="{ 'is-entry': showIntro }">
+      <div v-if="showIntro" class="auth-intro">
+        <p class="auth-intro-title">{{ copy.title }}</p>
+        <p>{{ copy.description }}</p>
+      </div>
+      <div class="auth-form-area"><slot/></div>
+    </main>
+    <ToastContainer/>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted } from 'vue'
+import { useRoute } from '#app'
 import { useI18n } from '~/composables/useI18n'
 
+const route = useRoute()
 const { lang, setLang } = useI18n()
 const langs = [
-  { code: 'ru' as const, label: 'RU' },
-  { code: 'en' as const, label: 'EN' },
-  { code: 'kk' as const, label: 'KZ' },
-]
-const langIndex = computed(() => Math.max(0, langs.findIndex(l => l.code === lang.value)))
+  { code: 'ru', label: 'RU', name: 'Русский' },
+  { code: 'en', label: 'EN', name: 'English' },
+  { code: 'kk', label: 'KZ', name: 'Қазақша' },
+] as const
+const introCopy = {
+  ru: { language: 'Язык интерфейса', title: 'Весь курс в\u00a0одном месте', description: 'Открывайте лекции, сдавайте задания и задавайте вопросы по материалам курса.' },
+  en: { language: 'Interface language', title: 'Your whole course in one place', description: 'Open lectures, submit assignments and ask questions about your course materials.' },
+  kk: { language: 'Интерфейс тілі', title: 'Бүкіл курс бір жерде', description: 'Дәрістерді ашыңыз, тапсырмаларды тапсырыңыз және курс материалдары бойынша сұрақ қойыңыз.' },
+} as const
+const copy = computed(() => introCopy[lang.value])
+const langIndex = computed(() => langs.findIndex(item => item.code === lang.value))
+const showIntro = computed(() => route.name === 'login' || route.name === 'register')
 
 onMounted(() => {
   document.documentElement.style.overflow = 'hidden'
@@ -38,83 +60,100 @@ onUnmounted(() => {
 
 <style scoped>
 .auth-shell {
-  position: fixed; inset: 0;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  overflow: hidden;
-  height: 100vh; height: 100dvh;
-  overscroll-behavior: none;
-  cursor: default;
-  background: var(--bg);
+  --glow-play-state: running;
+  position: fixed;
+  inset: 0;
+  isolation: isolate;
+  overflow: hidden auto;
+  overscroll-behavior: contain;
+  background: #f5f5f7;
 }
-.auth-content {
-  position: relative; z-index: 10;
-  display: flex; flex-direction: column; align-items: center;
-  gap: 22px; padding: 24px 20px;
-  width: 100%; max-width: 440px;
-  overflow-y: auto; overflow-x: hidden;
-  max-height: 100dvh;
-  scrollbar-width: none;
-  cursor: default;
-  animation: content-fade .32s ease both;
+.auth-glow { inset: 0 0 auto; height: min(100%, 880px); }
+.auth-header, .auth-stage { width: min(1160px, calc(100% - 64px)); margin-inline: auto; }
+.auth-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 76px;
+  padding-top: env(safe-area-inset-top, 0px);
 }
-.auth-content::-webkit-scrollbar { display: none; }
-@keyframes content-fade {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+.auth-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  color: #f8fafb;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -.02em;
 }
 .auth-logo-mark {
-  flex-shrink: 0;
-  display: block;
-  width: 118px; aspect-ratio: 1200 / 734;
-  background: linear-gradient(180deg, var(--teal), var(--teal-d));
-  -webkit-mask: url('/logo.png') center / contain no-repeat;
-  mask: url('/logo.png') center / contain no-repeat;
+  width: 27px;
+  height: 29px;
+  background: #00b1c9;
+  mask: url('/logo-icon.png') center / contain no-repeat;
 }
 .lang-switcher {
   position: relative;
-  display: flex; align-items: center;
-  background: var(--surface2); border-radius: 100px;
-  padding: 3px; flex-shrink: 0;
+  display: flex;
+  padding: 3px;
+  border: 1px solid #ffffff35;
+  border-radius: 999px;
+  background: #ffffff0c;
 }
 .lang-thumb {
-  position: absolute; top: 3px; bottom: 3px; left: 3px;
+  position: absolute;
+  inset: 3px auto 3px 3px;
   width: calc((100% - 6px) / 3);
-  background: var(--surface);
-  border-radius: 100px;
-  box-shadow: var(--sh-xs);
-  transition: transform .25s cubic-bezier(.4,0,.2,1);
+  border-radius: 999px;
+  background: #f8fafb;
+  transition: transform .28s cubic-bezier(.22,1,.36,1);
 }
 .lang-btn {
-  position: relative; z-index: 1;
-  width: 44px; padding: 6px 0; border-radius: 100px;
-  font-size: 12px; font-weight: 700;
-  letter-spacing: .04em; cursor: pointer;
-  background: none; border: none; color: var(--text3);
-  transition: color .2s ease;
+  position: relative;
+  width: 44px;
+  min-height: 38px;
+  border-radius: 999px;
+  color: #e5edf0;
+  font-size: 12px;
+  font-weight: 600;
 }
-.lang-btn.active { color: var(--text1); }
-@media (max-width:768px) {
-  .auth-shell { cursor: default; }
-  .auth-content {
-    padding: calc(14px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom));
-    gap: 16px;
-    /* max-width не снижаем до 100% — на телефонных ширинах это и так не
-       превышало 440px, а на широких "мобильных" (~600–768, планшет/большой
-       телефон в landscape) форма растягивалась почти во весь экран вместо
-       аккуратной читаемой карточки. */
-  }
-  .auth-logo-mark { width: 92px; }
-  .lang-btn { width: 48px; padding: 10px 0; font-size: 11px; min-height: 40px; display: inline-flex; align-items: center; justify-content: center; }
+.lang-btn:hover { color: #fff; }
+.lang-btn[aria-pressed="true"] { color: #13262d; }
+.auth-stage {
+  display: grid;
+  align-items: center;
+  min-height: calc(100dvh - 76px);
+  padding: 48px 0 calc(64px + env(safe-area-inset-bottom, 0px));
 }
-@media (max-width:480px) {
-  .auth-content { padding: calc(10px + env(safe-area-inset-top)) 14px calc(14px + env(safe-area-inset-bottom)); gap: 14px; }
-  .auth-logo-mark { width: 80px; }
+.auth-stage.is-entry { grid-template-columns: minmax(0, 1fr) minmax(0, 448px); gap: 80px; }
+.auth-form-area { width: min(100%, 448px); min-width: 0; justify-self: center; }
+.auth-intro { align-self: start; max-width: 560px; padding-top: 64px; color: #f8fafb; }
+.auth-intro-title { font-size: 60px; line-height: 1.05; font-weight: 600; letter-spacing: -.048em; text-wrap: balance; }
+.auth-intro p + p { max-width: 390px; margin-top: 16px; color: #d9e4e8; font-size: 16px; line-height: 24px; text-wrap: pretty; }
+
+@media (max-width: 980px) {
+  .auth-stage.is-entry { grid-template-columns: minmax(0, 1fr) minmax(0, 400px); gap: 40px; }
+  .auth-intro-title { font-size: 48px; }
 }
-/* Низкие экраны (клавиатура открыта / landscape) — прижимаем контент к верху, чтобы форма не обрезалась */
-@media (max-height:640px) {
-  .auth-shell { justify-content: flex-start; }
-  .auth-logo-mark { width: 64px; }
-  .auth-content { gap: 10px; }
+@media (max-width: 720px) {
+  .auth-header, .auth-stage { width: calc(100% - 32px); }
+  .auth-header { min-height: 64px; }
+  .auth-stage, .auth-stage.is-entry { grid-template-columns: minmax(0, 1fr); min-height: 0; padding-top: 32px; }
+  .auth-intro { display: none; }
+  .auth-glow { height: min(100%, 720px); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .auth-intro, .auth-form-area { animation: auth-enter .6s cubic-bezier(.22,1,.36,1) both; }
+  .auth-form-area { animation-delay: .07s; }
+  .auth-form-area:focus-within { animation: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lang-thumb { transition: none; }
+}
+@keyframes auth-enter {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
 }
 </style>

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 840" preserveAspectRatio="none">
+  <defs>
+    <filter id="feather" x="-30%" y="-30%" width="160%" height="160%" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="54"/>
+    </filter>
+    <linearGradient id="tail" x2="0" y2="1">
+      <stop offset=".84" stop-color="#fff"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+    <mask id="bounds" maskUnits="userSpaceOnUse" x="0" y="0" width="1440" height="840">
+      <path d="M0 0H1440V840H0Z" fill="url(#tail)"/>
+    </mask>
+  </defs>
+  <g mask="url(#bounds)">
+    <path d="M-220-220H1660V613C1420 577 1280 576 1130 660S904 780 737 739 530 607 348 651 100 799-220 747Z"
+      fill="#fff" filter="url(#feather)"/>
+  </g>
+</svg>
