@@ -9,6 +9,20 @@ const STALE_MS = 60_000
 
 const pinnedKey = (userId: number) => `_pinned_subjects_${userId}`
 
+function readLegacyPins(userId: number) {
+  try {
+    const raw = localStorage.getItem(pinnedKey(userId))
+    if (raw == null) return null
+    const saved = JSON.parse(raw)
+    const ids = Array.isArray(saved)
+      ? [...new Set<number>(saved.filter(id => Number.isInteger(id) && id > 0 && id <= 2_147_483_647))]
+      : []
+    return { raw, ids }
+  } catch {
+    return null
+  }
+}
+
 export const useClassesStore = defineStore('classes', {
   state: () => ({
     list: [] as ClassResponse[],
@@ -17,6 +31,9 @@ export const useClassesStore = defineStore('classes', {
     lastFetch: 0,
     pinnedUserId: null as number | null,
     pinnedIds: [] as number[],
+    pinsLoaded: false,
+    pinsBusy: false,
+    pinsSession: 0,
   }),
 
   getters: {
@@ -24,26 +41,55 @@ export const useClassesStore = defineStore('classes', {
   },
 
   actions: {
-    loadPins(userId: number) {
-      if (this.pinnedUserId === userId) return
-      this.pinnedUserId = userId
-      this.pinnedIds = []
+    async loadPins(userId: number | null) {
+      if (this.pinnedUserId !== userId) {
+        this.pinnedUserId = userId
+        this.pinnedIds = userId == null ? [] : readLegacyPins(userId)?.ids ?? []
+        this.pinsLoaded = false
+        this.pinsBusy = false
+        this.pinsSession++
+      }
+      if (userId == null || this.pinsBusy) return
+
+      const session = this.pinsSession
+      const svc = useClassesSvc()
+      const legacy = readLegacyPins(userId)
+      this.pinsBusy = true
       try {
-        const saved = JSON.parse(localStorage.getItem(pinnedKey(userId)) || '[]')
-        if (Array.isArray(saved)) {
-          this.pinnedIds = [...new Set<number>(saved.filter((id) => Number.isInteger(id) && id > 0))]
+        if (legacy) {
+          for (let offset = 0; offset < legacy.ids.length; offset += 500) {
+            if (session !== this.pinsSession) return
+            await svc.importPins(legacy.ids.slice(offset, offset + 500))
+          }
         }
-      } catch { /* Pins remain available in memory if browser storage is unavailable. */ }
+        if (session !== this.pinsSession) return
+        const ids = await svc.listPins()
+        if (session !== this.pinsSession) return
+        this.pinnedIds = ids
+        this.pinsLoaded = true
+        if (legacy) {
+          try {
+            if (localStorage.getItem(pinnedKey(userId)) === legacy.raw) localStorage.removeItem(pinnedKey(userId))
+          } catch { /* Import is idempotent if storage cannot be cleared. */ }
+        }
+      } finally {
+        if (session === this.pinsSession) this.pinsBusy = false
+      }
     },
 
-    togglePin(userId: number, classId: number) {
-      this.loadPins(userId)
-      this.pinnedIds = this.pinnedIds.includes(classId)
-        ? this.pinnedIds.filter(id => id !== classId)
-        : [...this.pinnedIds, classId]
+    async togglePin(userId: number, classId: number) {
+      if (this.pinnedUserId !== userId || !this.pinsLoaded || this.pinsBusy) return
+
+      const session = this.pinsSession
+      const pinned = !this.pinnedIds.includes(classId)
+      this.pinsBusy = true
       try {
-        localStorage.setItem(pinnedKey(userId), JSON.stringify(this.pinnedIds))
-      } catch { /* Keep the current in-memory selection. */ }
+        await useClassesSvc().setPin(classId, pinned)
+        if (session !== this.pinsSession) return
+        this.pinnedIds = pinned ? [...this.pinnedIds, classId] : this.pinnedIds.filter(id => id !== classId)
+      } finally {
+        if (session === this.pinsSession) this.pinsBusy = false
+      }
     },
 
     // Список классов живёт в сторе, а не в локальном state страницы — Nuxt

@@ -82,9 +82,13 @@ const classesStore = useClassesStore()
 const { t, lang } = useI18n()
 const doLogout = () => { logout() }
 
-watch(() => auth.user?.id, (userId) => {
-  if (import.meta.client && userId != null) classesStore.loadPins(userId)
-}, { immediate: true })
+const syncPins = () => classesStore.loadPins(auth.user?.id ?? null).catch(() => {})
+const syncVisiblePins = () => {
+  if (document.visibilityState === 'visible') syncPins()
+}
+watch(() => auth.user?.id, () => {
+  if (import.meta.client) syncPins()
+}, { immediate: true, flush: 'sync' })
 
 const isCollapsed = ref(false)
 const isMobile = ref(true)
@@ -122,10 +126,14 @@ onMounted(() => {
     resizeHandler = () => { isMobile.value = window.innerWidth <= 768 }
     resizeHandler()
     window.addEventListener('resize', resizeHandler)
+    window.addEventListener('focus', syncPins)
+    document.addEventListener('visibilitychange', syncVisiblePins)
   }
 })
 onUnmounted(() => {
   if (import.meta.client && resizeHandler) window.removeEventListener('resize', resizeHandler)
+  window.removeEventListener('focus', syncPins)
+  document.removeEventListener('visibilitychange', syncVisiblePins)
   if (collapsedClassTimer) { clearTimeout(collapsedClassTimer); collapsedClassTimer = null }
 })
 </script>

@@ -33,9 +33,10 @@ const minimalPdf = () => {
   return Buffer.from(content)
 }
 
-async function mockApi(page: Page, options: { authenticated?: boolean; role?: 'student' | 'teacher' | 'admin'; withPdf?: boolean; withClass?: boolean; withDeadlines?: boolean } = {}) {
+async function mockApi(page: Page, options: { authenticated?: boolean; role?: 'student' | 'teacher' | 'admin'; withPdf?: boolean; withClass?: boolean; withDeadlines?: boolean; pins?: Set<number> } = {}) {
   const authenticated = options.authenticated ?? true
   const role = options.role ?? 'student'
+  const pins = options.pins ?? new Set<number>()
   let nextSubmission: { id: number; assignment_id: number; student_id: number; status: string; submitted_at: string } | null = null
   await page.addInitScript(() => localStorage.setItem('org_type', 'university'))
   await page.route('http://localhost:8000/api/**', async (route) => {
@@ -56,6 +57,16 @@ async function mockApi(page: Page, options: { authenticated?: boolean; role?: 's
       return json(route, { id: 1, email: `${role}@example.test`, is_active: true, is_verified: true, role, org_type: 'university', full_name: 'E2E User' })
     }
     if (path.endsWith('/auth/logout')) return route.fulfill({ status: 204, headers: corsHeaders })
+    if (path.endsWith('/classes/pins')) return json(route, [...pins])
+    if (path.endsWith('/classes/pins/import')) {
+      for (const id of request.postDataJSON().class_ids) pins.add(id)
+      return route.fulfill({ status: 204, headers: corsHeaders })
+    }
+    if (path.endsWith('/classes/pins/1')) {
+      if (request.postDataJSON().pinned) pins.add(1)
+      else pins.delete(1)
+      return route.fulfill({ status: 204, headers: corsHeaders })
+    }
     if (path.endsWith('/classes/cover/options')) return json(route, {})
     const e2eClass = {
       id: 1, name: 'E2E Course', description: 'Browser test course', created_by: 1,
@@ -152,7 +163,9 @@ test('sidebar shows saved subjects above the nearest outstanding deadline', asyn
     await expect(sidebar.getByRole('link', { name: 'Предметы' })).toBeVisible()
     await expect(pinned).toHaveCount(0)
     await expect(deadline).toHaveCount(0)
-    await expect(pin).toHaveCount(0)
+    await pin.click()
+    await expect(page.getByRole('region', { name: 'Закреплённые предметы' })
+      .getByRole('link', { name: 'E2E Course' })).toBeVisible()
     return
   }
 
@@ -182,6 +195,32 @@ test('sidebar shows saved subjects above the nearest outstanding deadline', asyn
   await expect(deadline.getByRole('link', { name: /Later assignment/ })).toBeVisible()
   await page.getByRole('button', { name: 'Отозвать и сдать заново' }).click()
   await expect(deadline.getByRole('link', { name: /Next assignment/ })).toBeVisible()
+})
+
+test('legacy pins migrate and appear in another browser context', async ({ page, browser }) => {
+  const pins = new Set<number>()
+  await mockApi(page, { withClass: true, pins })
+  await page.addInitScript(() => localStorage.setItem('_pinned_subjects_1', '[1]'))
+  await page.goto('/')
+  const original = page.getByRole('button', { name: 'Закрепить предмет: E2E Course' })
+  await expect.poll(() => page.evaluate(() => localStorage.getItem('_pinned_subjects_1'))).toBeNull()
+  await expect(original).toHaveAttribute('aria-pressed', 'true')
+
+  const other = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true })
+  try {
+    const fresh = await other.newPage()
+    await mockApi(fresh, { withClass: true, pins })
+    await fresh.goto('/')
+    const pinned = fresh.getByRole('region', { name: 'Закреплённые предметы' })
+    await expect(pinned.getByRole('link', { name: 'E2E Course' })).toBeVisible()
+    await fresh.getByRole('button', { name: 'Закрепить предмет: E2E Course' }).click()
+    await expect(pinned).toHaveCount(0)
+
+    await page.evaluate(() => window.dispatchEvent(new Event('focus')))
+    await expect(original).toHaveAttribute('aria-pressed', 'false')
+  } finally {
+    await other.close()
+  }
 })
 
 test('teacher create-class dialog traps focus, closes with Escape, and restores focus', async ({ page }) => {

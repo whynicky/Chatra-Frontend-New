@@ -28,6 +28,10 @@
         </div>
 
 
+        <div v-if="isMobile && !loading && activeClasses.some(subject => pinnedIds.includes(subject.id))" class="mobile-pins">
+          <SidebarStudy :collapsed="false" :show-deadlines="false" />
+        </div>
+
         <div class="classes-grid">
           <!-- Скелетон повторяет реальную раскладку карточки — тот же приём,
                что уже был только в архиве классов, а самый частый экран
@@ -68,8 +72,9 @@
                   <button v-if="auth.user" type="button" class="card-cover-btn card-pin-btn"
                           :aria-label="`${t('sidebar.pin_subject')}: ${cls.name}`"
                           :aria-pressed="pinnedIds.includes(cls.id)"
+                          :disabled="classesStore.pinsBusy"
                           :title="t(pinnedIds.includes(cls.id) ? 'sidebar.unpin_subject' : 'sidebar.pin_subject')"
-                          @click.stop="classesStore.togglePin(auth.user.id, cls.id)">
+                          @click.stop="toggleSubjectPin(cls.id)">
                     <svg width="16" height="16" viewBox="0 0 24 24" :fill="pinnedIds.includes(cls.id) ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4h10v16l-5-3.5L7 20z"/></svg>
                   </button>
                   <button v-if="canManage(cls)" type="button" class="card-cover-btn" @click.stop="openEditClass(cls)" title="Редактировать">
@@ -276,6 +281,7 @@ import { usePostsSvc } from '~/services/posts'
 import { useClassesSvc } from '~/services/classes'
 import { useToast } from '~/composables/useToast'
 import { useI18n } from '~/composables/useI18n'
+import { useIsMobile } from '~/composables/useIsMobile'
 import { useCohortErrors } from '~/composables/useCohortErrors'
 import { useCoverArt } from '~/composables/useCoverArt'
 import { fixFileUrl } from '~/composables/useFileUrl'
@@ -284,6 +290,17 @@ const auth = useAuthStore(); const postsSvc = usePostsSvc(); const classesSvc = 
 const classesStore = useClassesStore()
 const pinnedIds = computed(() => classesStore.pinnedUserId === auth.user?.id ? classesStore.pinnedIds : [])
 const { t, lang, setLang } = useI18n()
+const isMobile = useIsMobile()
+const toggleSubjectPin = async (classId: number) => {
+  const userId = auth.user?.id
+  if (userId == null) return
+  try {
+    if (!classesStore.pinsLoaded) await classesStore.loadPins(userId)
+    await classesStore.togglePin(userId, classId)
+  } catch {
+    toast.err(t('sidebar.pins_sync_error'))
+  }
+}
 const cohortErrors = useCohortErrors()
 const coverArt = useCoverArt()
 // Список берём из общего стора (переживает переход между страницами) — при
@@ -703,13 +720,15 @@ watch(() => auth.user?.id, async (newId) => {
 .card-code-chip:hover{background:rgba(30,30,32,.75)}
 .card-code-chip:active{transform:scale(.96)}
 .card-code-chip svg{flex-shrink:0;display:block}
-.card-cover-actions{position:absolute;z-index:2;top:10px;right:10px;display:flex;gap:4px}
+.card-cover-actions{position:absolute;z-index:2;top:10px;right:10px;display:flex;align-items:center;gap:4px}
 .card-cover-btn{width:32px;height:32px;border-radius:50%;background:rgba(30,30,32,.52);border:1px solid rgba(255,255,255,.2);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s,transform .15s;-webkit-backdrop-filter:blur(14px) saturate(160%);backdrop-filter:blur(14px) saturate(160%)}
 .card-cover-btn:hover{background:rgba(var(--teal-rgb),.82);border-color:rgba(255,255,255,.24)}
 .card-cover-btn:active{transform:scale(.92)}
 .card-pin-btn[aria-pressed="true"]{background:var(--surface);color:var(--text1);border-color:var(--border)}
 .card-pin-btn:focus-visible{outline:2px solid #fff;outline-offset:2px}
-@media (max-width:768px){.card-pin-btn{display:none}}
+.card-pin-btn:disabled{cursor:wait;opacity:.7}
+.mobile-pins{margin-bottom:16px}
+@media (max-width:768px){.card-pin-btn{width:44px;height:44px}}
 
 .card-body{display:flex;flex:1;flex-direction:column;padding:18px 20px 18px}
 /* Название — единственный явный заголовок карточки (декоративная иконка

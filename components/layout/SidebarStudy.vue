@@ -59,7 +59,7 @@ import { useAssignmentsSvc } from '~/services/assignments'
 import { useAuthStore } from '~/stores/auth.store'
 import { useClassesStore } from '~/stores/classes.store'
 
-defineProps<{ collapsed: boolean }>()
+const props = withDefaults(defineProps<{ collapsed: boolean; showDeadlines?: boolean }>(), { showDeadlines: true })
 
 const auth = useAuthStore()
 const classesStore = useClassesStore()
@@ -70,7 +70,7 @@ const { t, lang } = useI18n()
 const coverArt = useCoverArt()
 
 const activeClassId = computed(() => Number(route.params.classId ?? route.params.id))
-const isStudent = computed(() => auth.user?.role === 'student')
+const isStudent = computed(() => props.showDeadlines && auth.user?.role === 'student')
 const subjects = computed(() => classesStore.list.filter(subject => !subject.is_archived_for_user))
 const subjectIds = computed(() => subjects.value.map(subject => subject.id).sort((a, b) => a - b).join(','))
 const pinnedSubjects = computed(() => {
@@ -197,4 +197,5 @@ html.dark .study-subject-glow img{filter:blur(12px) saturate(1.15) brightness(.7
 .study-compact .study-deadline{height:36px}
 .study-compact :is(.study-heading,.study-status,.study-calendar-extra){height:0;padding-block:0;opacity:0}
 .study-compact .study-copy{opacity:0}
+@media (max-width:768px){.study-link{height:44px}}
 </style>

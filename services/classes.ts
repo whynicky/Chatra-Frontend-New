@@ -46,6 +46,17 @@ export const useClassesSvc = () => {
   const api = useApi()
 
   return {
+    listPins: async (): Promise<number[]> => {
+      const { data } = await api.get('/classes/pins')
+      return data
+    },
+    importPins: async (classIds: number[]): Promise<void> => {
+      await api.post('/classes/pins/import', { class_ids: classIds })
+    },
+    setPin: async (classId: number, pinned: boolean): Promise<void> => {
+      await api.put(`/classes/pins/${classId}`, { pinned })
+    },
+
     list: async (opts?: { limit?: number; offset?: number }): Promise<ClassResponse[]> => {
       const params: Record<string, any> = {}
       if (opts?.limit != null) params.limit = opts.limit
