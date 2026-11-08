@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/images/readme-cover.webp" alt="Обложка Chatra с надписью на фоне голубого неба и стеклянных панелей" width="100%" />
+</p>
+
 <div align="center">
 
 <img src="public/favicon-icon.png" alt="Логотип Chatra" width="64">
